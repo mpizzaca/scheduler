@@ -3,12 +3,21 @@ import axios from "axios";
 
 const SET_DAY = "SET_DAY";
 const SET_DAYS = "SET_DAYS";
+const SET_INTERVIEW = "SET_INTERVIEW";
 const SET_APPOINTMENTS = "SET_APPOINTMENTS";
 const SET_APPLICATION_DATA = "SET_APPLICATION_DATA";
 
 export default function useApplicationData() {
   const reducer = (state, action) => {
-    const { type, day, days, appointments, interviewers } = action;
+    const {
+      type,
+      day,
+      days,
+      appointments,
+      interviewers,
+      id,
+      interview,
+    } = action;
     switch (type) {
       case SET_DAY:
         return { ...state, day };
@@ -18,6 +27,16 @@ export default function useApplicationData() {
         return { ...state, days };
       case SET_APPOINTMENTS:
         return { ...state, appointments };
+      case SET_INTERVIEW:
+        return {
+          ...state,
+          appointments: {
+            ...state.appointments,
+            [id]: { ...state.appointments[id], interview },
+          },
+        };
+      default:
+        return state;
     }
   };
 
@@ -45,6 +64,7 @@ export default function useApplicationData() {
       dispatch({ type: SET_APPOINTMENTS, appointments });
 
       // update 'spots remaining'
+      // TODO: this runs when editing an appointment, erroneously reducing the spots remaining
       for (const day of state.days) {
         if (day.appointments.find((apt) => apt === id)) {
           const days = [...state.days];
@@ -81,6 +101,17 @@ export default function useApplicationData() {
   };
 
   useEffect(() => {
+    const webSocket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
+    webSocket.onopen = (evt) => {
+      console.log("Websocket opened", evt);
+    };
+
+    webSocket.onmessage = (evt) => {
+      const cmd = JSON.parse(evt.data);
+      console.log("Websocket msg received:", evt.data);
+      dispatch(cmd);
+    };
+
     const daysPromise = axios.get("/api/days");
     const appointmentsPromise = axios.get("/api/appointments");
     const interviewersPromise = axios.get("/api/interviewers");
@@ -95,6 +126,8 @@ export default function useApplicationData() {
         });
       }
     );
+
+    return () => webSocket.close();
   }, []);
 
   return { state, setDay, bookInterview, cancelInterview };
