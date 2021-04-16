@@ -103,12 +103,10 @@ export default function useApplicationData() {
   useEffect(() => {
     const webSocket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
     webSocket.onopen = (evt) => {
-      console.log("Websocket opened", evt);
     };
 
     webSocket.onmessage = (evt) => {
       const cmd = JSON.parse(evt.data);
-      console.log("Websocket msg received:", evt.data);
       dispatch(cmd);
     };
 
