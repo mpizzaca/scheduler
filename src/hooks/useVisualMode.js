@@ -16,12 +16,14 @@ export default function useVisualMode(initial) {
   };
 
   const push = (mode, replace) => {
-    const tmpHist = replace ? history.slice(0, -1) : history;
-    setHistory([...tmpHist, mode]);
+    setHistory((prev) => {
+      const hist = replace ? prev.slice(0, -1) : prev;
+      return [...hist, mode];
+    });
   };
 
   const pop = () => {
-    setHistory([...history.slice(0, -1)]);
+    setHistory((prev) => [...prev.slice(0, -1)]);
     return history.slice(-2)[0];
   };
 

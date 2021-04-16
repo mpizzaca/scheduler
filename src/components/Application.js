@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React from "react";
 import DayList from "components/DayList";
 import Appointment from "components/Appointment";
+import useAppointmentData from "../hooks/useApplicationData";
 import "components/Application.scss";
 import {
   getAppointmentsForDay,
@@ -10,45 +10,29 @@ import {
 } from "../helpers/selectors";
 
 export default function Application(props) {
-  const [state, setState] = useState({
-    day: "Monday",
-    days: [],
-    appointments: {},
-    interviewers: {},
-  });
+  const {
+    state,
+    setDay,
+    bookInterview,
+    cancelInterview,
+  } = useAppointmentData();
 
-  useEffect(() => {
-    const daysPromise = axios.get("/api/days");
-    const appointmentsPromise = axios.get("/api/appointments");
-    const interviewersPromise = axios.get("/api/interviewers");
-
-    Promise.all([daysPromise, appointmentsPromise, interviewersPromise]).then(
-      (all) => {
-        setState((prev) => ({
-          ...prev,
-          days: all[0].data,
-          appointments: all[1].data,
-          interviewers: all[2].data,
-        }));
-      }
-    );
-  }, []);
-
-  const appointments = getAppointmentsForDay(state, state.day);
   const interviewers = getInterviewersForDay(state, state.day);
-  const appointmentComponents = appointments.map((appointment) => {
-    const interview = getInterview(state, appointment.interview);
-    return (
-      <Appointment
-        key={appointment.id}
-        {...appointment}
-        interviewers={interviewers}
-        interview={interview}
-      />
-    );
-  });
-
-  const setDay = (day) => setState({ ...state, day });
+  const appointmentComponents = getAppointmentsForDay(state, state.day).map(
+    (appointment) => {
+      const interview = getInterview(state, appointment.interview);
+      return (
+        <Appointment
+          key={appointment.id}
+          {...appointment}
+          interviewers={interviewers}
+          interview={interview}
+          bookInterview={bookInterview}
+          cancelInterview={cancelInterview}
+        />
+      );
+    }
+  );
 
   return (
     <main className="layout">
