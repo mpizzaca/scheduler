@@ -1,13 +1,34 @@
-import { useState, useEffect } from "react";
+import { useEffect, useReducer } from "react";
 import axios from "axios";
 
+const SET_DAY = "SET_DAY";
+const SET_DAYS = "SET_DAYS";
+const SET_APPOINTMENTS = "SET_APPOINTMENTS";
+const SET_APPLICATION_DATA = "SET_APPLICATION_DATA";
+
 export default function useApplicationData() {
-  const [state, setState] = useState({
+  const reducer = (state, action) => {
+    const { type, day, days, appointments, interviewers } = action;
+    switch (type) {
+      case SET_DAY:
+        return { ...state, day };
+      case SET_APPLICATION_DATA:
+        return { ...state, days, appointments, interviewers };
+      case SET_DAYS:
+        return { ...state, days };
+      case SET_APPOINTMENTS:
+        return { ...state, appointments };
+    }
+  };
+
+  const [state, dispatch] = useReducer(reducer, {
     day: "Monday",
     days: [],
     appointments: {},
     interviewers: {},
   });
+
+  const setDay = (day) => dispatch({ type: SET_DAY, day });
 
   const bookInterview = (id, interview) => {
     const appointment = {
@@ -21,16 +42,14 @@ export default function useApplicationData() {
     };
 
     return axios.put(`/api/appointments/${id}`, { ...appointment }).then(() => {
-      setState({ ...state, appointments });
+      dispatch({ type: SET_APPOINTMENTS, appointments });
 
       // update 'spots remaining'
       for (const day of state.days) {
         if (day.appointments.find((apt) => apt === id)) {
-          const newDays = [...state.days];
-          newDays[day.id - 1].spots -= 1;
-          setState((prev) => {
-            return { ...prev, days: newDays };
-          });
+          const days = [...state.days];
+          days[day.id - 1].spots -= 1;
+          dispatch({ type: SET_DAYS, days });
         }
       }
     });
@@ -48,22 +67,18 @@ export default function useApplicationData() {
     };
 
     return axios.delete(`/api/appointments/${id}`).then(() => {
-      setState({ ...state, appointments });
+      dispatch({ type: SET_APPOINTMENTS, appointments });
 
       // update 'spots remaining'
       for (const day of state.days) {
         if (day.appointments.find((apt) => apt === id)) {
-          const newDays = [...state.days];
-          newDays[day.id - 1].spots += 1;
-          setState((prev) => {
-            return { ...prev, days: newDays };
-          });
+          const days = [...state.days];
+          days[day.id - 1].spots += 1;
+          dispatch({ type: SET_DAYS, days });
         }
       }
     });
   };
-
-  const setDay = (day) => setState({ ...state, day });
 
   useEffect(() => {
     const daysPromise = axios.get("/api/days");
@@ -72,12 +87,12 @@ export default function useApplicationData() {
 
     Promise.all([daysPromise, appointmentsPromise, interviewersPromise]).then(
       (all) => {
-        setState((prev) => ({
-          ...prev,
+        dispatch({
+          type: SET_APPLICATION_DATA,
           days: all[0].data,
           appointments: all[1].data,
           interviewers: all[2].data,
-        }));
+        });
       }
     );
   }, []);
