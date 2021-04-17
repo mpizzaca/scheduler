@@ -49,6 +49,7 @@ export default function useApplicationData() {
 
   const setDay = (day) => dispatch({ type: SET_DAY, day });
 
+  // set interview data for a given appointment id
   const bookInterview = (id, interview) => {
     const appointment = {
       ...state.appointments[id],
@@ -62,19 +63,10 @@ export default function useApplicationData() {
 
     return axios.put(`/api/appointments/${id}`, { ...appointment }).then(() => {
       dispatch({ type: SET_APPOINTMENTS, appointments });
-
-      // update 'spots remaining'
-      // TODO: this runs when editing an appointment, erroneously reducing the spots remaining
-      for (const day of state.days) {
-        if (day.appointments.find((apt) => apt === id)) {
-          const days = [...state.days];
-          days[day.id - 1].spots -= 1;
-          dispatch({ type: SET_DAYS, days });
-        }
-      }
     });
   };
 
+  // set interview=null for a given appointment id
   const cancelInterview = (id) => {
     const appointment = {
       ...state.appointments[id],
@@ -88,32 +80,21 @@ export default function useApplicationData() {
 
     return axios.delete(`/api/appointments/${id}`).then(() => {
       dispatch({ type: SET_APPOINTMENTS, appointments });
-
-      // update 'spots remaining'
-      for (const day of state.days) {
-        if (day.appointments.find((apt) => apt === id)) {
-          const days = [...state.days];
-          days[day.id - 1].spots += 1;
-          dispatch({ type: SET_DAYS, days });
-        }
-      }
     });
   };
 
   useEffect(() => {
+    // setup websocket listener to render updates other users make
     const webSocket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
-    webSocket.onopen = (evt) => {
-    };
-
     webSocket.onmessage = (evt) => {
       const cmd = JSON.parse(evt.data);
       dispatch(cmd);
     };
 
+    // fetch data to initialize app state
     const daysPromise = axios.get("/api/days");
     const appointmentsPromise = axios.get("/api/appointments");
     const interviewersPromise = axios.get("/api/interviewers");
-
     Promise.all([daysPromise, appointmentsPromise, interviewersPromise]).then(
       (all) => {
         dispatch({
@@ -127,6 +108,13 @@ export default function useApplicationData() {
 
     return () => webSocket.close();
   }, []);
+
+  // update 'spots remaining' when appointments change
+  useEffect(() => {
+    axios.get("/api/days").then((res) => {
+      dispatch({ type: SET_DAYS, days: res.data });
+    });
+  }, [state.appointments]);
 
   return { state, setDay, bookInterview, cancelInterview };
 }
