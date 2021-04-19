@@ -2,7 +2,7 @@ import { useEffect, useReducer } from "react";
 import axios from "axios";
 
 const SET_DAY = "SET_DAY";
-const UPDATE_SPOTS = "UPDATE_SPOTS";
+const UPDATE_SPOTS_REMAINING = "UPDATE_SPOTS_REMAINING";
 const SET_INTERVIEW = "SET_INTERVIEW";
 const SET_APPLICATION_DATA = "SET_APPLICATION_DATA";
 
@@ -22,7 +22,7 @@ export default function useApplicationData() {
         return { ...state, day };
       case SET_APPLICATION_DATA:
         return { ...state, days, appointments, interviewers };
-      case UPDATE_SPOTS:
+      case UPDATE_SPOTS_REMAINING:
         const currentDay = state.days.find((day) => day.name === state.day);
         const emptyAppointments = currentDay.appointments.filter(
           (appointmentId) =>
@@ -65,7 +65,7 @@ export default function useApplicationData() {
 
     return axios.put(`/api/appointments/${id}`, { ...appointment }).then(() => {
       dispatch({ type: SET_INTERVIEW, id, interview });
-      dispatch({ type: UPDATE_SPOTS });
+      dispatch({ type: UPDATE_SPOTS_REMAINING });
     });
   };
 
@@ -73,7 +73,7 @@ export default function useApplicationData() {
   const cancelInterview = (id) => {
     return axios.delete(`/api/appointments/${id}`).then(() => {
       dispatch({ type: SET_INTERVIEW, id, interview: null });
-      dispatch({ type: UPDATE_SPOTS });
+      dispatch({ type: UPDATE_SPOTS_REMAINING });
     });
   };
 
