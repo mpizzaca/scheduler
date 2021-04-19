@@ -2,7 +2,7 @@ import { useEffect, useReducer } from "react";
 import axios from "axios";
 
 const SET_DAY = "SET_DAY";
-const SET_DAYS = "SET_DAYS";
+const UPDATE_SPOTS = "UPDATE_SPOTS";
 const SET_INTERVIEW = "SET_INTERVIEW";
 const SET_APPLICATION_DATA = "SET_APPLICATION_DATA";
 
@@ -22,8 +22,18 @@ export default function useApplicationData() {
         return { ...state, day };
       case SET_APPLICATION_DATA:
         return { ...state, days, appointments, interviewers };
-      case SET_DAYS:
-        return { ...state, days };
+      case UPDATE_SPOTS:
+        const currentDay = state.days.find((day) => day.name === state.day);
+        const emptyAppointments = currentDay.appointments.filter(
+          (appointmentId) =>
+            state.appointments[appointmentId].interview === null
+        );
+        const newDays = [...state.days];
+        newDays[currentDay.id - 1].spots = emptyAppointments.length;
+        return {
+          ...state,
+          days: newDays,
+        };
       case SET_INTERVIEW:
         return {
           ...state,
@@ -55,6 +65,7 @@ export default function useApplicationData() {
 
     return axios.put(`/api/appointments/${id}`, { ...appointment }).then(() => {
       dispatch({ type: SET_INTERVIEW, id, interview });
+      dispatch({ type: UPDATE_SPOTS });
     });
   };
 
@@ -62,6 +73,7 @@ export default function useApplicationData() {
   const cancelInterview = (id) => {
     return axios.delete(`/api/appointments/${id}`).then(() => {
       dispatch({ type: SET_INTERVIEW, id, interview: null });
+      dispatch({ type: UPDATE_SPOTS });
     });
   };
 
@@ -90,13 +102,6 @@ export default function useApplicationData() {
 
     return () => webSocket.close();
   }, []);
-
-  // update 'spots remaining' when appointments change
-  useEffect(() => {
-    axios.get("/api/days").then((res) => {
-      dispatch({ type: SET_DAYS, days: res.data });
-    });
-  }, [state.appointments]);
 
   return { state, setDay, bookInterview, cancelInterview };
 }
