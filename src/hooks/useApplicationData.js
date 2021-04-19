@@ -4,7 +4,6 @@ import axios from "axios";
 const SET_DAY = "SET_DAY";
 const SET_DAYS = "SET_DAYS";
 const SET_INTERVIEW = "SET_INTERVIEW";
-const SET_APPOINTMENTS = "SET_APPOINTMENTS";
 const SET_APPLICATION_DATA = "SET_APPLICATION_DATA";
 
 export default function useApplicationData() {
@@ -25,8 +24,6 @@ export default function useApplicationData() {
         return { ...state, days, appointments, interviewers };
       case SET_DAYS:
         return { ...state, days };
-      case SET_APPOINTMENTS:
-        return { ...state, appointments };
       case SET_INTERVIEW:
         return {
           ...state,
@@ -56,30 +53,15 @@ export default function useApplicationData() {
       interview: { ...interview },
     };
 
-    const appointments = {
-      ...state.appointments,
-      [id]: appointment,
-    };
-
     return axios.put(`/api/appointments/${id}`, { ...appointment }).then(() => {
-      dispatch({ type: SET_APPOINTMENTS, appointments });
+      dispatch({ type: SET_INTERVIEW, id, interview });
     });
   };
 
   // set interview=null for a given appointment id
   const cancelInterview = (id) => {
-    const appointment = {
-      ...state.appointments[id],
-      interview: null,
-    };
-
-    const appointments = {
-      ...state.appointments,
-      [id]: appointment,
-    };
-
     return axios.delete(`/api/appointments/${id}`).then(() => {
-      dispatch({ type: SET_APPOINTMENTS, appointments });
+      dispatch({ type: SET_INTERVIEW, id, interview: null });
     });
   };
 
