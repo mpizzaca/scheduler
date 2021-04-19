@@ -5,7 +5,7 @@
   &__item {
     @include button-inactive--opacity;
 
-    transition: all 0.5s;
+    // transition: all 0.5s;
     border-radius: 16px;
     margin-right: 0.5rem;
 
