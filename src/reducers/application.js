@@ -30,7 +30,7 @@ const reducer = (state, action) => {
         },
       };
     default:
-      return state;
+      throw new Error(`Tried to reduce with unsupported action type: ${type}`);
   }
 };
 

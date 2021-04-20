@@ -25,6 +25,26 @@ describe("Form", () => {
     expect(getByTestId("student-name-input")).toHaveValue("Lydia Miller-Jones");
   });
 
+  it("prevents default form submission on the name field", () => {
+    // render the form
+    const { getByPlaceholderText } = render(
+      <Form interviewers={interviewers} />
+    );
+
+    // enter a name
+    fireEvent.change(getByPlaceholderText("Enter Student Name"), {
+      target: { value: "Lydia Miller-Jones" },
+    });
+    // press enter key
+    fireEvent.submit(getByPlaceholderText("Enter Student Name"));
+
+    // make sure form is still there and populated
+    expect(getByPlaceholderText("Enter Student Name")).toBeInTheDocument();
+    expect(getByPlaceholderText("Enter Student Name")).toHaveValue(
+      "Lydia Miller-Jones"
+    );
+  });
+
   it("validates that the student name is not blank", () => {
     const onSave = jest.fn();
     const { getByText } = render(
