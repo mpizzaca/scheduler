@@ -1,52 +1,13 @@
 import { useEffect, useReducer } from "react";
 import axios from "axios";
-
-const SET_DAY = "SET_DAY";
-const UPDATE_SPOTS_REMAINING = "UPDATE_SPOTS_REMAINING";
-const SET_INTERVIEW = "SET_INTERVIEW";
-const SET_APPLICATION_DATA = "SET_APPLICATION_DATA";
+import reducer, {
+  SET_DAY,
+  SET_INTERVIEW,
+  SET_APPLICATION_DATA,
+  UPDATE_SPOTS_REMAINING,
+} from "../reducers/application";
 
 export default function useApplicationData() {
-  const reducer = (state, action) => {
-    const {
-      type,
-      day,
-      days,
-      appointments,
-      interviewers,
-      id,
-      interview,
-    } = action;
-    switch (type) {
-      case SET_DAY:
-        return { ...state, day };
-      case SET_APPLICATION_DATA:
-        return { ...state, days, appointments, interviewers };
-      case UPDATE_SPOTS_REMAINING:
-        const currentDay = state.days.find((day) => day.name === state.day);
-        const emptyAppointments = currentDay.appointments.filter(
-          (appointmentId) =>
-            state.appointments[appointmentId].interview === null
-        );
-        const newDays = [...state.days];
-        newDays[currentDay.id - 1].spots = emptyAppointments.length;
-        return {
-          ...state,
-          days: newDays,
-        };
-      case SET_INTERVIEW:
-        return {
-          ...state,
-          appointments: {
-            ...state.appointments,
-            [id]: { ...state.appointments[id], interview },
-          },
-        };
-      default:
-        return state;
-    }
-  };
-
   const [state, dispatch] = useReducer(reducer, {
     day: "Monday",
     days: [],
