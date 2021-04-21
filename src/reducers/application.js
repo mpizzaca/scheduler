@@ -6,8 +6,8 @@ const UPDATE_SPOTS_REMAINING = "UPDATE_SPOTS_REMAINING";
 const reducer = (state, action) => {
   const { type, day, days, appointments, interviewers, id, interview } = action;
   switch (type) {
-    // case SET_DAY:
-    //   return { ...state, day };
+    case SET_DAY:
+      return { ...state, day };
     case SET_APPLICATION_DATA:
       return { ...state, days, appointments, interviewers };
     case UPDATE_SPOTS_REMAINING:
