@@ -1,7 +1,7 @@
 # Interview Scheduler
 
 [![CircleCI](https://circleci.com/gh/mpizzaca/scheduler.svg?style=shield)](https://circleci.com/gh/mpizzaca/scheduler)
-![Coverage statements](./coverage/badge-statements.svg)
+![Coverage statements](./badge-statements.svg)
 
 ## Demo
 [Live Demo on Netlify!](https://trusting-boyd-6fff97.netlify.app/) Please allow ~30s for Heroku to wake up to display the appointments.
