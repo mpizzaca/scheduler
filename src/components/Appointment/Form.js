@@ -58,7 +58,6 @@ export default function Form(props) {
           </Button>
           <Button
             confirm
-            //disabled={!name || !interviewer}
             onClick={validate}
           >
             Save

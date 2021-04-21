@@ -42,8 +42,9 @@ export default function useApplicationData() {
     // setup websocket listener to render updates other users make
     const webSocket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
     webSocket.onmessage = (evt) => {
-      const cmd = JSON.parse(evt.data);
-      dispatch(cmd);
+      // dispatch the received event to the reducer
+      dispatch(JSON.parse(evt.data));
+      // the event will either be a new or deleted interview -> update spots remaining for all days
       dispatch({ type: UPDATE_SPOTS_REMAINING });
     };
 
