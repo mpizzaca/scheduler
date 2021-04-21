@@ -11,12 +11,14 @@ const reducer = (state, action) => {
     case SET_APPLICATION_DATA:
       return { ...state, days, appointments, interviewers };
     case UPDATE_SPOTS_REMAINING:
-      const currentDay = state.days.find((day) => day.name === state.day);
-      const emptyAppointments = currentDay.appointments.filter(
-        (appointmentId) => state.appointments[appointmentId].interview === null
-      );
       const newDays = [...state.days];
-      newDays[currentDay.id - 1].spots = emptyAppointments.length;
+      newDays.forEach((currentDay) => {
+        const emptyAppointments = currentDay.appointments.filter(
+          (appointmentId) =>
+            state.appointments[appointmentId].interview === null
+        );
+        newDays[currentDay.id - 1].spots = emptyAppointments.length;
+      });
       return {
         ...state,
         days: newDays,

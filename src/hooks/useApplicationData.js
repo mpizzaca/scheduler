@@ -44,6 +44,7 @@ export default function useApplicationData() {
     webSocket.onmessage = (evt) => {
       const cmd = JSON.parse(evt.data);
       dispatch(cmd);
+      dispatch({ type: UPDATE_SPOTS_REMAINING });
     };
 
     // fetch data to initialize app state
