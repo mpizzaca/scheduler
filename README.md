@@ -1,7 +1,7 @@
 # Interview Scheduler
 
 [![CircleCI](https://circleci.com/gh/mpizzaca/scheduler.svg?style=shield)](https://circleci.com/gh/mpizzaca/scheduler)
-![Coverage statements](./badge-statements.svg)
+![Coverage statements](./docs/badge-statements.svg)
 
 ## Demo
 [Live Demo on Netlify!](https://trusting-boyd-6fff97.netlify.app/) Please allow ~30s for Heroku to wake up to display the appointments.
@@ -12,7 +12,9 @@ Allows users to schedule interviews on a date/time and with an interviewer of th
 
 Fully automated testing and deployment with CircleCI and Netlify.
 
+## Usage
 
+![Example gif](./docs/appointment_demo.gif)
 
 
 ## Setup
