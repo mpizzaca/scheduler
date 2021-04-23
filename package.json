@@ -60,6 +60,8 @@
       "src/**/*.js",
       "!src/index.js"
     ],
-    "coverageReporters": ["json-summary"]
+    "coverageReporters": [
+      "json-summary"
+    ]
   }
 }
