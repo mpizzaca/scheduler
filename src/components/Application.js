@@ -8,6 +8,7 @@ import {
   getInterviewersForDay,
   getInterview,
 } from "../helpers/selectors";
+import SkeletonAppointment from "./SkeletonAppointment";
 
 export default function Application(props) {
   const {
@@ -34,6 +35,16 @@ export default function Application(props) {
     }
   );
 
+  const noAppointments = appointmentComponents.length === 0;
+  const skeletonAppointments = [];
+  if (noAppointments) {
+    let skeletonCount = 5;
+    while (skeletonCount > 0) {
+      skeletonAppointments.push(<SkeletonAppointment />);
+      skeletonCount--;
+    }
+  }
+
   return (
     <main className="layout">
       <section className="sidebar">
@@ -53,6 +64,7 @@ export default function Application(props) {
         />
       </section>
       <section className="schedule">
+        {noAppointments && skeletonAppointments}
         {appointmentComponents}
         <Appointment key="last" time="5pm" />
       </section>
