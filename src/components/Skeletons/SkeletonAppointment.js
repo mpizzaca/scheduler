@@ -1,6 +1,5 @@
 import React from "react";
 import Skeleton from "react-loading-skeleton";
-import Header from "./Appointment/Header";
 
 export default function SkeletonAppointment() {
   const skeletonStyle = {

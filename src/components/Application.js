@@ -8,7 +8,8 @@ import {
   getInterviewersForDay,
   getInterview,
 } from "../helpers/selectors";
-import SkeletonAppointment from "./SkeletonAppointment";
+import SkeletonAppointments from "./Skeletons/SkeletonAppointments";
+import SkeletonDays from "./Skeletons/SkeletonDays";
 
 export default function Application(props) {
   const {
@@ -36,14 +37,7 @@ export default function Application(props) {
   );
 
   const noAppointments = appointmentComponents.length === 0;
-  const skeletonAppointments = [];
-  if (noAppointments) {
-    let skeletonCount = 5;
-    while (skeletonCount > 0) {
-      skeletonAppointments.push(<SkeletonAppointment />);
-      skeletonCount--;
-    }
-  }
+  const noDays = state.days.length === 0;
 
   return (
     <main className="layout">
@@ -55,6 +49,7 @@ export default function Application(props) {
         />
         <hr className="sidebar__separator sidebar--centered" />
         <nav className="sidebar__menu">
+          {noDays && <SkeletonDays />}
           <DayList days={state.days} day={state.day} setDay={setDay} />
         </nav>
         <img
@@ -64,7 +59,7 @@ export default function Application(props) {
         />
       </section>
       <section className="schedule">
-        {noAppointments && skeletonAppointments}
+        {noAppointments && <SkeletonAppointments />}
         {appointmentComponents}
         <Appointment key="last" time="5pm" />
       </section>
